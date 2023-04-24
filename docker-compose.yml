@@ -1,0 +1,41 @@
+version: "3.9"
+
+# db(Postgres),app(Django)のコンテナを作成
+services:
+  app:
+    container_name: app
+    build:
+      context: .
+      dockerfile: containers/django/Dockerfile
+    volumes:
+      - .:/code
+      - ./static:/static
+    # 8000番ポートをNginx側が接続できるよう開く
+    expose:
+      - "8000"
+    # シェルスクリプトを実行
+    #command: sh -c "chmod 755 /code/entrypoint.sh && /code/entrypoint.sh && gunicorn app.wsgi:application --bind 0.0.0.0:8000"
+    command: gunicorn opensearch_django.wsgi:application --bind 0.0.0.0:8000
+    # コンテナ内の環境変数を.env.prodを使って設定
+    env_file:
+      - .env
+  web:
+    # コンテナ名をwebに指定
+    container_name: web
+    # NginxのDockerfileをビルドする
+    build:
+      # ビルドコンテキストはカレントディレクトリ
+      context: .
+      dockerfile: containers/nginx/Dockerfile
+    # ボリュームを指定
+    # ローカルの/staticをコンテナの/staticにマウントする
+    volumes:
+      - ./static:/static
+    # ローカルの80番ボートをコンテナの80番ポートとつなぐ
+    ports:
+      - "80:80"
+    # 先にappを起動してからwebを起動する
+    depends_on:
+      - app
+volumes:
+  static:
