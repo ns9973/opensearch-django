@@ -1,0 +1,15 @@
+{% extends 'app/base.html' %}
+{% load utils %}
+{%  block content %}
+<div id="searcResult">
+    {% for hit in hits %}
+    <div class="p-4">
+        <p class="font-weight-bold">{{ hit|get_source:'_source'|get_value:'title' }}</p>
+        <a href="{{ hit|get_source:'_source'|get_value:'url' }}" class="font-italic">{{ hit|get_source:'_source'|get_value:'url' }}</a>
+        <p>{{ hit|get_source:'_source'|get_value:'body' }}</p>
+        <hr>
+    </div>
+    {% endfor %}
+
+</div>
+{% endblock %}

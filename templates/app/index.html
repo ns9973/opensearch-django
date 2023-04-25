@@ -1,0 +1,13 @@
+{% extends 'app/base.html' %}
+{%  block content %}
+<div class="p-4">
+<form action="{% url 'search' %}" method="get">
+    <div class="form-group">
+      <label for="queyString">検索キーワード</label>
+      <input name="q" type="text" class="form-control" id="queryString" aria-describedby="emailHelp" placeholder="Enter keyword">
+      <small id="queryHelp" class="form-text text-muted">We'll never share your keyword inputs.</small>
+    </div>
+   <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+  </div>
+{% endblock %}
