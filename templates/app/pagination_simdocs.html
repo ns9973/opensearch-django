@@ -1,0 +1,38 @@
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+            {% if navi_info.has_previous %}
+            <li class="page-item">
+            {% else %}
+            <li class="page-item disabled">
+            {% endif %}
+            <a class="page-link" href="#" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+        {% for lbl in  navi_info.labels  %}
+            {% if lbl == navi_info.current_page %}
+            <li id="page_{{ lbl }}" class="page-item disabled"><a class="page-link" href="#" onclick="pageButtonClicked({{ lbl }})">{{ lbl }}</a></li>
+            {% else %}
+            <li id="page_{{ lbl }}" class="page-item"><a class="page-link" href="#" onclick="pageButtonClicked({{ lbl }})">{{ lbl }}</a></li>
+            {% endif %}
+        {% endfor %}
+          {% if navi_info.has_next %}
+      <li class="page-item">
+          {% else %}
+      <li class="page-item disabled">
+          {% endif %}
+        <a class="page-link" href="#" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  <script>
+    function pageButtonClicked(newPageNum){
+        console.log(newPageNum);
+        var pageSize = {{ navi_info.page_size }}
+        $('#current-page').val(newPageNum);
+        $('#main-form').val("0");
+        $('#input-form').submit();
+    }
+  </script>

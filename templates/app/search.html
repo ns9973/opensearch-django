@@ -1,15 +1,21 @@
 {% extends 'app/base.html' %}
 {% load utils %}
 {%  block content %}
+        {% include 'app/index.html' %}
 <div id="searcResult">
     {% for hit in hits %}
     <div class="p-4">
         <p class="font-weight-bold">{{ hit|get_source:'_source'|get_value:'title' }}</p>
         <a href="{{ hit|get_source:'_source'|get_value:'url' }}" class="font-italic">{{ hit|get_source:'_source'|get_value:'url' }}</a>
-        <p>{{ hit|get_source:'_source'|get_value:'body' }}</p>
+        <!--<p>{{ hit|get_source:'_source'|get_value:'summary' }}</p>-->
+        <p>
+        {% for sum in hit.highlight.summary %}
+        {{ sum|safe }}
+        {% endfor %}
+        </p>
         <hr>
     </div>
     {% endfor %}
-
+    {% include 'app/pagination.html' %}
 </div>
 {% endblock %}

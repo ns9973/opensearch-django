@@ -1,0 +1,59 @@
+{% extends 'app/base.html' %}
+{% load utils %}
+{%  block content %}
+<div class="p-4">
+  <div class="mb-3">
+    <form id="input-form" action="{% url 'simdocs' %}" method="post">    
+      {% csrf_token %}
+      <label for="textArea1" class="form-label">テキスト</label>
+      <textarea maxlength="1000" name="text" class="form-control" id="textArea1" rows="10">{{ text }}</textarea>
+      <input id="current-page" type="hidden" name="p" value="{% if page_num %}{{page_num}}{% else %}1{%endif%}">
+      <input id="main-form" type="hidden" name="m" value="1">
+      <button type="submit" class="btn btn-primary mt-2">Submit</button>
+    </form>
+  </div>
+</div>
+<div class="px-4" id="simdocsSearcResult">
+   {% if result.hits.total.value > 0 %}
+        <span>類似文書に含まれるトピックワード</span></br>
+        <span id="most-frequent-terms"></span>
+        <div class="overflow-auto border p-2" style="height: 1000px;">
+        {% for hit in result.hits.hits %}
+            <p class="font-weight-bold">{{ hit|get_source:'_source'|get_value:'title' }}</p>
+            <p >{{ hit|get_source:'_source'|get_value:'summary' }}</p>
+            <a href="{{ hit|get_source:'_source'|get_value:'url' }}" class="font-italic">{{ hit|get_source:'_source'|get_value:'url' }}</a>
+            <hr>
+        {% endfor %}
+        </div>
+        <div class="mt-4" id="paginagion_area">
+        {% include 'app/pagination_simdocs.html' %}
+        </div>
+    {% else %}
+        {% if text %}
+        <p>何も見つかりませんでした。</p>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
+{% block extrajs %}
+<script>
+$(function () {
+    $.ajax({
+      url:  "{% url 'simdocs_most_frequent_terms' %}",
+      type: "POST",
+      data:{
+        encoded_text: '{{ encoded_text }}',
+        csrfmiddlewaretoken: '{{ csrf_token }}' 
+      },
+      dataType: "json"
+    }).done(function(response){
+      var tag = "";
+      for (let i=0; i<response.result.aggregations.freq_terms.buckets.length; i++){
+        tag = tag + " #" + response.result.aggregations.freq_terms.buckets[i].key;
+      } 
+      console.log(tag);
+      $('#most-frequent-terms').text(tag);    
+    });
+  });
+</script>
+{% endblock %}
